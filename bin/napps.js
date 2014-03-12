@@ -36,19 +36,25 @@ cli.command("restart <name>")
 .description("Gracefully restart an application (--force to skip shutdown)")
 .option("--force", "Restart without sending shutdown signal")
 .action(function(name, opts){
-	daemonRequest("/apps/" + name + "/" + (opts.force ? "restart" : "reload"), null, "POST").done();
+	ensureDaemon(true)
+	.then(daemonRequest.bind(null, "/apps/" + name + "/" + (opts.force ? "restart" : "reload"), null, "POST"))
+	.done();
 });
 
 cli.command("start <name>")
 .description("Start an application")
 .action(function(name){
-	daemonRequest("/apps/" + name + "/start", null, "POST").done();
+	ensureDaemon(true)
+	.then(daemonRequest.bind(null, "/apps/" + name + "/start", null, "POST"))
+	.done();
 });
 
 cli.command("stop <name>")
 .description("Stop a running application")
 .action(function(name){
-	daemonRequest("/apps/" + name + "/stop", null, "POST").done();
+	ensureDaemon(true)
+	.then(daemonRequest.bind(null, "/apps/" + name + "/stop", null, "POST"))
+	.done();
 });
 
 
