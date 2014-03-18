@@ -323,7 +323,8 @@ function appStatus(name) {
 }
 
 function printStatus(details) {
-	if (!_.isArray(details)) details = [details];
+    var detailed = false;
+	if (!_.isArray(details)) detailed = true, details = [details];
 
 	var tableHeader = ["App Name", "Status", "PID", "Uptime", "Crashes", "Ports", "#", "CPU", "MEM"];
 	tableHeader = tableHeader.map(function(header){
@@ -334,7 +335,7 @@ function printStatus(details) {
 		head: tableHeader
 	});
 
-	if (details.length > 1) {
+	if (details.length >= 1 && (!detailed || !details[0].status)) {
 		_.each(details, function(app){
 			var status = "OFFLINE".red;
 			var instances = "", ports = "", uptime = "", workerPIDs = "", pid = "", crashes = "", cpu = "", mem = "";
@@ -351,7 +352,7 @@ function printStatus(details) {
 				ports = _.flatten(app.status.workers, "listening");
 				ports = _.uniq(ports, "port");
 				ports = _.pluck(ports, "port");
-				ports = ports.join(" ");
+				ports = ports.join(",");
 				uptime = moment.duration(app.status.uptime, "seconds").humanize();
 				pid = app.status.pid;
 				crashes = app.status.deathCount - app.status.killCount;
@@ -421,7 +422,7 @@ function printDetailedStatus(app) {
 		var row = {};
         var uptime = moment.duration(worker.uptime, "seconds").humanize();
         
-		row[(app.id + ":" + worker.id).bold] = [worker.pid, _.pluck(worker.listening, "port"), uptime, prettyMem(worker.totalMem), worker.totalCpu.toFixed(2) + "%", worker.totalProc]
+		row[(app.id + ":" + worker.id).bold] = [worker.pid, _.pluck(worker.listening, "port"), uptime, worker.totalCpu.toFixed(2) + "%", prettyMem(worker.totalMem), worker.totalProc]
 		table.push(row);
 	});
 	console.log(table.toString());
